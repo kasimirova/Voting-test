@@ -22,7 +22,7 @@ describe("Voting", function () {
   );
 
   it("Make a voting as not an owner", async function () {
-    await (expect(await voting.connect(addr1).addVoting([addr2.address, addr3.address]))).to.be.revertedWith("Sender is not an owner"); 
+    await expect(voting.connect(addr1).addVoting([addr2.address, addr3.address])).to.be.revertedWith("Sender is not an owner"); 
   }
   );
 
@@ -35,12 +35,12 @@ describe("Voting", function () {
   );
 
   it("Make a vote with not enough money", async function () {
-    expect(await voting.connect(addr6).vote(addr2.address, 0, {value: ethers.utils.parseEther("0.001")})).to.be.revertedWith("Not enough or too much money"); 
+    await expect(voting.connect(addr6).vote(addr2.address, 0, {value: ethers.utils.parseEther("0.001")})).to.be.revertedWith("Not enough or too much money"); 
   }
   );
 
   it("Make a vote second time", async function () {
-    expect(await voting.connect(addr3).vote(addr2.address, 0, {value: ethers.utils.parseEther("0.001")})).to.be.revertedWith("You can vote only once"); 
+    await expect(voting.connect(addr3).vote(addr2.address, 0, {value: ethers.utils.parseEther("0.001")})).to.be.revertedWith("You can vote only once"); 
   }
   );
 
@@ -57,7 +57,7 @@ describe("Voting", function () {
   it("Close voting earlier", async function () {
     await network.provider.send("evm_increaseTime", [259100]);
     await network.provider.send("evm_mine");
-    expect(await voting.connect(addr3).closeVoting(0)).to.be.revertedWith("It's too soon to close this voting"); 
+    await expect(voting.connect(addr3).closeVoting(0)).to.be.revertedWith("It's too soon to close this voting"); 
 
   }
   );
@@ -72,20 +72,18 @@ describe("Voting", function () {
   );
 
   it("Close already closed voting", async function () {
-    expect(await voting.connect(addr3).closeVoting(0)).to.be.revertedWith("The voting is already closed"); 
+    await expect(voting.connect(addr3).closeVoting(0)).to.be.revertedWith("The voting is already closed"); 
   }
   );
 
   it("Withdraw commission as not an owner", async function () {
-    expect(await voting.connect(addr3).withdrawCommission()).to.be.revertedWith("Sender is not an owner"); 
+    await expect(voting.connect(addr3).withdrawCommission()).to.be.revertedWith("Sender is not an owner"); 
   }
   );
 
   it("Withdraw commission as an owner", async function () {
-    const balanceBefore = await provider.getBalance(owner.address);
     await voting.withdrawCommission();
-    let commission = await voting.commission();
-    expect((await provider.getBalance(owner.address))).to.equal(balanceBefore.toString() + commission.toString()); 
+    expect(await voting.commission()).to.equal(0); 
   }
   );
 
